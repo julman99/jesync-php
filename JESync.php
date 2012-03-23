@@ -8,11 +8,6 @@ class JESync {
 
     private $servers = array();
     private $sockets = array();
-    private $token;
-
-    public function __construct() {
-        $this->token = uniqid();
-    }
 
     private function getSocket($key) {
         $hash = md5($key);
