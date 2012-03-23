@@ -10,14 +10,26 @@ class JESync {
     private $servers = array();
 
     private function getSocket($key) {
-        $hash = md5($key);
-        $mod = count($this->servers);
-        $num = intval(substr($hash, 0, 3), 16);
-        $server = $this->servers[$num % $mod];
-        if (!isset(self::$sockets[$server])) {
-            self::$sockets[$server] = fsockopen($server, 11400);
+        $count=count($this->servers);
+        if($count>0){
+            if($count>1){
+                //More than 1 server, hash the key to select the appropiate one
+                $hash = md5($key);
+                $mod = count($this->servers);
+                $num = intval(substr($hash, 0, 3), 16);
+                $server = $this->servers[$num % $mod];
+            }else{
+                //Only one server, no need to hash
+                $server=$this->servers[0];
+            }
+            //TODO:check for port on the server string <server>[:<port>]            
+            if (!isset(self::$sockets[$server])) {
+                self::$sockets[$server] = fsockopen($server, 11400);
+            }
+            return self::$sockets[$server];
+        }else{
+            throw new Exception('No servers added to the server pool');
         }
-        return self::$sockets[$server];
     }
 
     /**
@@ -39,12 +51,15 @@ class JESync {
      */
     public function lock($key, $maxConcurrent = 1, $timeout = -1) {
         $f = $this->getSocket($key);
-        
-        fputs($f, sprintf("lock %s %d %d\n", $key, $maxConcurrent, $timeout));
-        $res = explode(' ', fgets($f));
+        if($f){
+            fputs($f, sprintf("lock %s %d %d\n", $key, $maxConcurrent, $timeout));
+            $res = explode(' ', fgets($f));
 
-        $handle = new JESyncLock($key, (int) $res[1], (int) $res[2], $res[0] == 'GRANTED',$f);
-        return $handle;
+            $handle = new JESyncLock($key, (int) $res[1], (int) $res[2], $res[0] == 'GRANTED',$f);
+            return $handle;
+        }else{
+            return false;
+        }
     }
 }
 
