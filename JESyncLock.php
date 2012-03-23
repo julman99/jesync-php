@@ -1,6 +1,6 @@
 <?php
 /**
- * Description of JESyncLock
+ * Represents a lock key status
  *
  * @author julio
  */
@@ -35,6 +35,12 @@ class JESyncLock {
         return $this->locked;
     }
 
+    /**
+     * Releases the lock on the key. This can only be called if the lock was
+     * granted to the instance on which the method is being called
+     * @return bool true if the lock was released
+     * @throws Exception 
+     */
     public function release(){
         if(!$this->locked){
             throw new Exception('The lock handle is not locked');

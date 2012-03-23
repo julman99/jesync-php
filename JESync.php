@@ -1,6 +1,6 @@
 <?php
 /**
- * Description of JESync
+ * Class used to connect to a JESync server and request a lock
  *
  * @author julio
  */
@@ -25,10 +25,23 @@ class JESync {
         return $this->sockets[$server];
     }
 
+    /**
+     * Adds a server to the server connection pool 
+     * @param string $server 
+     */
     public function addServer($server) {
         $this->servers[] = $server;
     }
 
+    /**
+     * Request the lock for a key
+     * If there is more than a server in the connection pool the key will be hashed
+     * and will be locked in one of the servers only 
+     * @param string $key
+     * @param int $maxConcurrent
+     * @param int $timeout
+     * @return JESyncLock 
+     */
     public function lock($key, $maxConcurrent = 1, $timeout = -1) {
         $f = $this->getSocket($key);
         
