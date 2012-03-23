@@ -8,7 +8,7 @@ JESync-php is the php driver to connect to the [JESync Server](https://github.co
     $je->addServer('jesync1.foo');
     $je->addServer('jesync2.foo');
 
-    $key='akey'
+    $key='akey';
     $timeout=4; //seconds
     $maxConcurrent=1; //only 1 lock can be granted at a time for the key
 
