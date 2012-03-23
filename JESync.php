@@ -6,18 +6,18 @@
  */
 class JESync {
 
+    private static $sockets = array();
     private $servers = array();
-    private $sockets = array();
 
     private function getSocket($key) {
         $hash = md5($key);
         $mod = count($this->servers);
         $num = intval(substr($hash, 0, 3), 16);
         $server = $this->servers[$num % $mod];
-        if (!isset($this->sockets[$server])) {
-            $this->sockets[$server] = fsockopen($server, 11400);
+        if (!isset(self::$sockets[$server])) {
+            self::$sockets[$server] = fsockopen($server, 11400);
         }
-        return $this->sockets[$server];
+        return self::$sockets[$server];
     }
 
     /**
