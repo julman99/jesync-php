@@ -3,7 +3,7 @@
 function _jesyncphp_autoload_funcs($class) {    
     if (substr($class, 0, strlen(__NAMESPACE__)) != __NAMESPACE__)
         return false;
-    $path = $class.'.php';
+    $path =__DIR__.'/'.$class.'.php';
     if (file_exists($path)){
         require_once($path);
     }else{
