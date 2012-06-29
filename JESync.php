@@ -47,19 +47,21 @@ class JESync {
      * @param string $key
      * @param int $maxConcurrent
      * @param int $timeout
+     * @param int $timeoutExpires The amount of seconds the lock will be granted
      * @return JESyncLock 
      */
-    public function lock($key, $maxConcurrent = 1, $timeout = -1) {
+    public function lock($key, $maxConcurrent = 1, $timeout = -1, $timeoutExpires = 120) {
         $f = $this->getSocket($key);
         if($f){
-            fputs($f, sprintf("lock %s %d %d\n", $key, $maxConcurrent, $timeout));
+            fputs($f, sprintf("lock %s %d %d %d\n", $key, $maxConcurrent, $timeout, $timeoutExpires));
             $res = explode(' ', fgets($f));
 
-            $handle = new JESyncLock($key, (int) $res[1], (int) $res[2], $res[0] == 'GRANTED',$f);
+            $handle = new JESyncLock($key, (int) $res[1], (int) $res[2], $res[0] == 'GRANTED', $res[4],$this , $f);
             return $handle;
         }else{
             return false;
         }
     }
+
 }
 
